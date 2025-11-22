@@ -29,6 +29,7 @@ typedef struct {
 extern libnet_t *l; // Libnet context
 extern device *victim; 
 extern device *router;
+extern uint8_t *attacker_mac_addr;
 
 // --- Function Prototypes ---
 
@@ -40,16 +41,17 @@ extern device *router;
  * @param iface Interface name (e.g., "eth0").
  * @return void
  */
-void arp_spoof(device *fake_source, device *destination, const uint8_t *attacker_mac_addr, const char *iface);
+void arp_spoof(device *fake_source, device *destination, const char *iface);
 
 
 /**
  * @brief Restores the target device's ARP cache by sending multiple genuine ARP replies.
  * @param fake_source The device whose true IP-MAC association is restored (the Router or the Victim).
  * @param destination The device whose cache needs cleaning (the Victim or the Router).
+ * @param attacker_mac_addr Your machine's MAC address.
  * @return void
  */
-void arp_restore(device *fake_source, device *destination);
+void arp_restore(device *source, device *destination);
 
 
 /**
