@@ -61,19 +61,19 @@ void arp_spoof(device *fake_source, device *destination, const uint8_t *attacker
 // ARP Restoration
 // -------------------------------------------------------------
 
-void arp_restore(device *fake_source, device *destination) {
+void arp_restore(device *source, device *destination) {
         
     // Loop to send multiple restoration packets
     for (int i = 0; i < TARGET_COUNT; i++) {
-        // Build ARP header (Real MAC: source_mac_addr, Real IP: source_ip)
+        // Build ARP header
         libnet_ptag_t arp_tag = libnet_build_arp(
             ARPHRD_ETHER, 
             ETHERTYPE_IP,
             HARDWARE_ADDR_SIZE, 
             PROTOCOL_ADDR_SIZE, 
             ARPOP_REPLY, 
-            fake_source->mac_addr, 
-            (uint8_t *)&fake_source->ip_addr,
+            source->mac_addr, 
+            (uint8_t *)&source->ip_addr,
             destination->mac_addr, 
             (uint8_t *)&destination->ip_addr,
             NULL, 
@@ -85,7 +85,7 @@ void arp_restore(device *fake_source, device *destination) {
         // Build Ethernet header
         libnet_ptag_t eth_tag = libnet_build_ethernet(
             destination->mac_addr, 
-            fake_source->mac_addr, 
+            source->mac_addr, 
             ETHERTYPE_ARP, 
             NULL, 
             0, 
