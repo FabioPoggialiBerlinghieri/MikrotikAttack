@@ -9,7 +9,7 @@ sudo apt install libpcap-dev
 
 Then, compile the program with:
 ```bash
-gcc -o sniff main.c sniff.c handle_http_packet.c -lpcap
+gcc -o sniff main.c handle_http_packet.c -lpcap
 ```
 **Note:** You need root privileges (or use `sudo`) to run the program. Additionally, you must enable packet forwarding on your machine by running the following commands:
 ```bash
