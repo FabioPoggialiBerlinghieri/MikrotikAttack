@@ -12,12 +12,12 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 sudo iptables -P FORWARD ACCEPT
 ```
 
-Finally, you can run the program with:
+Finally, you can compile the program with:
 ```bash
 gcc main.c arpSpoofFunctions.c -o arpSpoof -lnet
 ```
 
-And you can execute it with:
+And you can run it with:
 ```bash
 ./arpSpoof <Victim_IP> <Victim_MAC> <Router_IP> <Router_MAC> <Web_Interface>
 ```
@@ -36,6 +36,11 @@ sudo apt install libpcap-dev
 Then, compile the program with:
 ```bash
 gcc -o sniff main.c handle_http_packet.c -lpcap
+```
+
+And you can run it with:
+```bash
+./sniff <Web_Interface>
 ```
 
 
