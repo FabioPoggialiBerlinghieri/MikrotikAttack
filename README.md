@@ -1,4 +1,4 @@
-## Compile `sniff`
+## Compile `spoof`
 
 First af all, install the necessary development package:
 ```bash
