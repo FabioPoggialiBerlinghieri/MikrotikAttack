@@ -6,7 +6,7 @@ sudo apt update
 sudo apt install libnet1 libnet1-dev
 ```
 
-Then, you need root privileges (or use `sudo`) to run the program. Additionally, you must enable packet forwarding on your machine by running the following commands:
+Then, you need root privileges (use `sudo -i`) to run the program. Additionally, you must enable packet forwarding on your machine by running the following commands:
 ```bash
 echo 1 > /proc/sys/net/ipv4/ip_forward
 sudo iptables -P FORWARD ACCEPT
